@@ -4,10 +4,13 @@ import scipy.io.wavfile as wav
 import speech_recognition as sr
 from deep_translator import MyMemoryTranslator
 import random
+import time
 
 vida = 3
 duration = 5  # segundos de gravação
 sample_rate = 44100
+
+print("hello")
 
 words_by_level = {
     "facil": ["gato", "cachorro", "maçã", "leite", "sol"],
@@ -26,53 +29,40 @@ if nivel==2:
 if nivel==3:
     dificuldade = "dificil"
 
-while True:
-    palavra = random.choice(words_by_level[dificuldade])
-    print("Fale em ingles a palavra:", palavra)
+
+palavra = random.choice(words_by_level[dificuldade])
+print("Fale em ingles a palavra:", palavra)
     
-    print("Fale agora...")
-    recording = sd.rec(
-    int(duration * sample_rate), # o número de amostras a serem registradas
-    samplerate=sample_rate,      # taxa de amostras
-    channels=1,                  # 1 significa gravação mono
-    dtype="int16")               # tipo de dados para as amostras registradas
-    sd.wait()  # aguardando o término da gravação
+print("Fale agora...")
+recording = sd.rec(
+int(duration * sample_rate), # o número de amostras a serem registradas
+samplerate=sample_rate,      # taxa de amostras
+channels=1,                  # 1 significa gravação mono
+dtype="int16")               # tipo de dados para as amostras registradas
+sd.wait()  # aguardando o término da gravação
 
-    wav.write("output.wav", sample_rate, recording)
-    print("Gravação concluída, estou reconhecendo...")
+wav.write("output.wav", sample_rate, recording)
+print("Gravação concluída, estou reconhecendo...")
+recognizer = sr.Recognizer()
+with sr.AudioFile("output.wav") as source:
+    audio = recognizer.record(source)
 
-    recognizer = sr.Recognizer()
-    with sr.AudioFile("output.wav") as source:
-        audio = recognizer.record(source)
-
-    try:
-        text = recognizer.recognize_google(audio, language="pt-BR")
-        print("Você disse:", text)
+try:
+    text = recognizer.recognize_google(audio, language="pt-BR")
+    print("Você disse:", text)
         
-        translator = MyMemoryTranslator(
-            source="pt-BR",
-            target="en-US"
-        ).translate(text).lower
+    translator = MyMemoryTranslator(
+        source="pt-BR",
+        target="en-US"
+    ).translate(text).lower
         
-        print("🌍 Tradução para o inglês:", translator)
-
-        ingles = MyMemoryTranslator(source="pt-BR",
-                    target="en-US"
-        ).translate(palavra)
-        
-
-        if palavra == text:
-            print("Parabens você acertou a palavra")
-        else:
-            print("Você errou")
-            vida -= 1
+    print("Tradução para o inglês:", translator)
+    
 
 
-    except sr.UnknownValueError:             # - se o Google não conseguiu entender a fala devido a ruídos ou silêncio
-        print("A fala não pôde ser reconhecida.")
-    except sr.RequestError as e:             # - se não houver conexão com a Internet ou a API estiver indisponível
-        print(f"Service error: {e}")
+except sr.UnknownValueError:             # - se o Google não conseguiu entender a fala devido a ruídos ou silêncio
+    print("A fala não pôde ser reconhecida.")
+except sr.RequestError as e:             # - se não houver conexão com a Internet ou a API estiver indisponível
+    print(f"Service error: {e}")
 
-    if vida == 0:
-        print("Você perdeu todas as suas vidas")
-        break
+   
