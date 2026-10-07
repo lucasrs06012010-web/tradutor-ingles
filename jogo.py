@@ -7,7 +7,7 @@ import random
 import time
 
 vida = 3
-acertos = 0
+acertos_seguidos = 0
 pontos= 0
 duration = 5  # segundos de gravação
 sample_rate = 44100
@@ -64,7 +64,7 @@ while True:
         if text.strip().lower() == ingles.strip().lower():
             print("Parabens você acertou a palavra")
             pontos += 1
-            acertos += 1
+            acertos_seguidos += 1
         else:
             print("Você errou")
             vida -= 1
@@ -73,7 +73,7 @@ while True:
 
         if acertos == 2:
             vida +=1
-            acertos = 0
+            acertos_seguidos = 0
 
     except sr.UnknownValueError:             # - se o Google não conseguiu entender a fala devido a ruídos ou silêncio
         print("A fala não pôde ser reconhecida.")
